@@ -1,9 +1,9 @@
-import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { createResponse } from 'src/helper/api.helper';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
+import { LOGIN_BODY, REGISTER_BODY } from 'src/constants/api-body';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -17,11 +17,7 @@ export class AuthController {
     type: RegisterDto,
     examples: {
       'application/json': {
-        value: {
-          fullname: 'John Doe',
-          email: 'johndoe@example.com',
-          password: 'P@ssw0rd123',
-        },
+        value: REGISTER_BODY,
       },
     },
   })
@@ -37,10 +33,7 @@ export class AuthController {
     type: LoginDto,
     examples: {
       'application/json': {
-        value: {
-          email: 'johndoe@example.com',
-          password: 'P@ssw0rd123',
-        },
+        value: LOGIN_BODY,
       },
     },
   })

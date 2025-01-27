@@ -1,38 +1,35 @@
-import { Body, Controller, Param, Put } from '@nestjs/common';
+import { Body, Controller, Get, Put, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserDto } from './dto/user.dto';
+import { USER_BODY } from 'src/constants/api-body';
+import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags('User')
+@ApiBearerAuth()
+@UseGuards(AuthGuard)
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private userService: UserService) {}
 
-  @Put(':id')
-  @ApiOperation({ summary: 'API for update user details' })
+  @Get('me')
+  @ApiOperation({ summary: 'API for get details me' })
+  async getMe(@Req() req: { user: Me }) {
+    return this.userService.getUser(req.user.id);
+  }
+
+  @Put('me')
+  @ApiOperation({ summary: 'API for update details me' })
   @ApiBody({
-    description: 'User details data',
+    description: 'Me details data',
     type: UserDto,
     examples: {
       'application/json': {
-        value: {
-          fullname: 'John Doe',
-          email: 'johndoe@example.com',
-          password: 'P@ssw0rd123',
-          business: {
-            name: 'Your Business',
-            description: 'Lorem ipsum dolor sit amet.',
-            tagline: 'Lorem ipsum dolor sit amet.',
-            email: 'business@example.com',
-            website: 'http://your-business.com',
-            phone: '+6285123456789',
-            address: 'XYZ Street',
-          },
-        },
+        value: USER_BODY,
       },
     },
   })
-  async updateUser(@Param('id') id: string, @Body() userDto: UserDto) {
-    return this.userService.updateUser(id, userDto);
+  async updateMe(@Req() req: { user: Me }, @Body() userDto: UserDto) {
+    return this.userService.updateUser(req.user.id, userDto);
   }
 }
