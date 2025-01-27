@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { createResponse } from './helper/api.helper';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  getHealthCheck() {
+    return createResponse('success', HttpStatus.OK, 'API is running fine!');
   }
 }
