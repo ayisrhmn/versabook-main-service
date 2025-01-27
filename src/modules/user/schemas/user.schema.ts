@@ -14,6 +14,20 @@ export class User {
   @Prop()
   password: string;
 
+  @Prop({
+    type: Object,
+    default: null,
+  })
+  business: {
+    name: string;
+    description: string;
+    tagline: string;
+    email: string;
+    website: string;
+    phone: string;
+    address: string;
+  };
+
   @Prop({ default: null })
   deletedAt: Date;
 }
