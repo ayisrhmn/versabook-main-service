@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Req,
   UseGuards,
@@ -14,18 +15,26 @@ import { FormDto } from './dto/form.dto';
 import { FORM_BODY } from 'src/constants/api-body';
 
 @ApiTags('Form')
-@ApiBearerAuth()
-@UseGuards(AuthGuard)
 @Controller('form')
 export class FormController {
   constructor(private readonly formService: FormService) {}
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Get()
   @ApiOperation({ summary: 'API for get details form' })
   async getFormData(@Req() req: { user: Me }) {
     return this.formService.getForm(req.user.id);
   }
 
+  @Get('client/:slug')
+  @ApiOperation({ summary: 'API for get form by business slug' })
+  async getBookById(@Param('slug') slug: string) {
+    return this.formService.getFormClient(slug);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Post()
   @ApiOperation({ summary: 'API for create or update details form' })
   @ApiBody({
@@ -41,6 +50,8 @@ export class FormController {
     return this.formService.upsertForm(req.user.id, formDto.fields);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Delete()
   @ApiOperation({ summary: 'API for delete data form' })
   async deleteFormFields(@Req() req: { user: Me }) {

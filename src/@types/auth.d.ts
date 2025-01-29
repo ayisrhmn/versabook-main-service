@@ -3,3 +3,10 @@ interface Me {
   email: string;
   fullname: string;
 }
+
+interface MeBusiness extends Me {
+  business: {
+    name: string;
+    slug: string;
+  };
+}

@@ -13,7 +13,16 @@ export class User extends Document {
   password: string;
 
   @Prop({
-    type: Object,
+    type: {
+      name: { type: String },
+      description: { type: String },
+      tagline: { type: String },
+      email: { type: String },
+      website: { type: String },
+      phone: { type: String },
+      address: { type: String },
+      slug: { type: String, unique: true },
+    },
     default: null,
   })
   business: {

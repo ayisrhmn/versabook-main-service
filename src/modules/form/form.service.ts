@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Form } from './schemas/form.schema';
@@ -18,7 +18,28 @@ export class FormService {
   async getForm(userId: string) {
     const form = await this.formModel.findOne({ userId, deletedAt: null });
     const data = form || { userId, fields: [] };
-    return createResponse('success', 200, data);
+    return createResponse('success', HttpStatus.OK, data);
+  }
+
+  async getFormClient(slug: string) {
+    const user = await this.userService.getBusinessSlug(slug);
+
+    if (user) {
+      const form = await this.formModel.findOne({
+        userId: user?.id,
+        deletedAt: null,
+      });
+      if (!form) {
+        throw new NotFoundException(
+          createResponse('error', HttpStatus.NOT_FOUND, 'Form not found'),
+        );
+      }
+      return createResponse('success', HttpStatus.OK, form);
+    } else {
+      throw new NotFoundException(
+        createResponse('error', HttpStatus.NOT_FOUND, 'Form not found'),
+      );
+    }
   }
 
   // Create or Update form fields
@@ -46,7 +67,7 @@ export class FormService {
       }
     }
 
-    return createResponse('success', 201, upsertForm);
+    return createResponse('success', HttpStatus.CREATED, upsertForm);
   }
 
   // Soft Delete form by setting deletedAt date
@@ -55,7 +76,7 @@ export class FormService {
 
     if (!form) {
       throw new NotFoundException(
-        createResponse('error', 404, 'Form not found'),
+        createResponse('error', HttpStatus.NOT_FOUND, 'Form not found'),
       );
     }
 
@@ -79,6 +100,10 @@ export class FormService {
       }
     }
 
-    return createResponse('success', 200, 'Form deleted successfully');
+    return createResponse(
+      'success',
+      HttpStatus.OK,
+      'Form deleted successfully',
+    );
   }
 }

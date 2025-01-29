@@ -23,6 +23,14 @@ export class UserService {
     return createResponse('success', HttpStatus.OK, findMe as Me);
   }
 
+  async getBusinessSlug(slug: string) {
+    const findMe = await this.userModel.findOne(
+      { 'business.slug': slug, deletedAt: null },
+      '-password',
+    );
+    return findMe;
+  }
+
   async updateUser(userId: string, userDto: UserDto) {
     // Hash password
     const hashedPassword = userDto.password

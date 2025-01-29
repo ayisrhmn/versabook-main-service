@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Book } from './schemas/book.schema';
@@ -37,7 +37,7 @@ export class BookService {
       }
     }
 
-    return createResponse('success', 201, result);
+    return createResponse('success', HttpStatus.CREATED, result);
   }
 
   // Get all books
@@ -64,7 +64,7 @@ export class BookService {
       .limit(limit);
 
     return {
-      ...createResponse('success', 200, books),
+      ...createResponse('success', HttpStatus.OK, books),
       pagination: {
         total,
         page,
@@ -76,11 +76,12 @@ export class BookService {
 
   async getBookById(bookId: string) {
     const book = await this.bookModel.findById(bookId);
-    if (!book)
+    if (!book) {
       throw new NotFoundException(
-        createResponse('success', 200, 'Booking not found'),
+        createResponse('error', HttpStatus.NOT_FOUND, 'Booking not found'),
       );
-    return createResponse('success', 200, book);
+    }
+    return createResponse('success', HttpStatus.OK, book);
   }
 
   // Activate book
@@ -89,10 +90,11 @@ export class BookService {
       _id: bookId,
       userId,
     });
-    if (!book)
+    if (!book) {
       throw new NotFoundException(
-        createResponse('error', 404, 'Book not found'),
+        createResponse('error', HttpStatus.NOT_FOUND, 'Book not found'),
       );
+    }
 
     book.deletedAt = null;
     await book.save();
@@ -114,7 +116,11 @@ export class BookService {
       }
     }
 
-    return createResponse('success', 200, 'Book activated successfully');
+    return createResponse(
+      'success',
+      HttpStatus.OK,
+      'Book activated successfully',
+    );
   }
 
   // Soft delete book
@@ -124,10 +130,11 @@ export class BookService {
       userId,
       deletedAt: null,
     });
-    if (!book)
+    if (!book) {
       throw new NotFoundException(
-        createResponse('error', 404, 'Book not found'),
+        createResponse('error', HttpStatus.NOT_FOUND, 'Book not found'),
       );
+    }
 
     book.deletedAt = new Date();
     await book.save();
@@ -149,7 +156,11 @@ export class BookService {
       }
     }
 
-    return createResponse('success', 200, 'Book canceled successfully');
+    return createResponse(
+      'success',
+      HttpStatus.OK,
+      'Book canceled successfully',
+    );
   }
 
   // Delete book
@@ -157,7 +168,7 @@ export class BookService {
     const book = await this.bookModel.findByIdAndDelete(bookId);
     if (!book) {
       throw new NotFoundException(
-        createResponse('error', 404, 'Book not found'),
+        createResponse('error', HttpStatus.NOT_FOUND, 'Book not found'),
       );
     }
 
@@ -178,6 +189,6 @@ export class BookService {
       }
     }
 
-    return createResponse('success', 200, 'Book deleted permanently');
+    return createResponse('success', HttpStatus.OK, 'Book deleted permanently');
   }
 }

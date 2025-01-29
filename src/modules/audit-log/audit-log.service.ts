@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { AuditLog } from './schemas/audit-log.schema';
 import { Model } from 'mongoose';
@@ -33,7 +33,7 @@ export class AuditLogService {
       .limit(limit);
 
     return {
-      ...createResponse('success', 200, logs),
+      ...createResponse('success', HttpStatus.OK, logs),
       pagination: {
         total,
         page,
