@@ -38,8 +38,6 @@ export class FormService {
     form.deletedAt = new Date(); // Set deletedAt to current date
     await form.save();
 
-    return createResponse('success', 200, {
-      message: 'Form deleted successfully',
-    });
+    return createResponse('success', 200, 'Form deleted successfully');
   }
 }

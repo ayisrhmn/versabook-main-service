@@ -26,8 +26,12 @@ export class Form extends Document {
     order: number;
   }>;
 
-  @Prop({ default: null })
-  deletedAt: Date;
+  @Prop({
+    type: Date,
+    required: false,
+    default: null,
+  })
+  deletedAt: Date | null;
 }
 
 export const FormSchema = SchemaFactory.createForClass(Form);

@@ -26,8 +26,12 @@ export class User extends Document {
     address: string;
   };
 
-  @Prop({ default: null })
-  deletedAt: Date;
+  @Prop({
+    type: Date,
+    required: false,
+    default: null,
+  })
+  deletedAt: Date | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

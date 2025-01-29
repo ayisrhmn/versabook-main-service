@@ -35,3 +35,23 @@ export const FORM_BODY = {
     },
   ],
 };
+
+export const BOOK_BODY = {
+  formData: [
+    {
+      label: 'Nama',
+      value: 'John Doe',
+      type: 'text',
+    },
+    {
+      label: 'Tanggal',
+      value: '2025-01-29T05:39:57.553Z',
+      type: 'date',
+    },
+    {
+      label: 'Pembayaran',
+      value: 'Transfer',
+      type: 'select',
+    },
+  ],
+};
