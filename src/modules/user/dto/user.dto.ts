@@ -11,5 +11,6 @@ export class UserDto extends RegisterDto {
     website: string;
     phone: string;
     address: string;
+    slug: string;
   };
 }

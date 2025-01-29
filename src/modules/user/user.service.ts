@@ -6,6 +6,7 @@ import { UserDto } from './dto/user.dto';
 import { createResponse } from 'src/helper/api.helper';
 import * as bcrypt from 'bcrypt';
 import { AuditLogService } from '../audit-log/audit-log.service';
+import { toSlug } from 'src/helper/string.helper';
 
 @Injectable()
 export class UserService {
@@ -28,16 +29,27 @@ export class UserService {
       ? await bcrypt.hash(userDto.password, 10)
       : undefined;
 
+    // business name to slug
+    const businessSlug =
+      userDto.business && userDto.business.name
+        ? toSlug(String(userDto.business.name))
+        : undefined;
+
+    let payload = userDto;
+
+    if (hashedPassword) {
+      payload.password = hashedPassword;
+    }
+
+    if (payload.business && payload.business.name && businessSlug) {
+      payload.business.slug = businessSlug;
+    }
+
     // Updated user
     const updatedUser = await this.userModel.findByIdAndUpdate(
       userId,
       {
-        $set: hashedPassword
-          ? {
-              ...userDto,
-              password: hashedPassword,
-            }
-          : userDto,
+        $set: payload,
       },
       { new: true, fields: '-password' },
     );

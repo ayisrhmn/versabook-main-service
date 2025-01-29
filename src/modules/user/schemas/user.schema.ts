@@ -24,6 +24,7 @@ export class User extends Document {
     website: string;
     phone: string;
     address: string;
+    slug: string;
   };
 
   @Prop({
