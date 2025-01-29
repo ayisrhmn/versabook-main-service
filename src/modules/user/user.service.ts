@@ -11,7 +11,10 @@ export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async getUser(userId: string) {
-    const findMe = await this.userModel.findById(userId, '-password');
+    const findMe = await this.userModel.findOne(
+      { _id: userId, deletedAt: null },
+      '-password',
+    );
     return createResponse('success', HttpStatus.OK, findMe);
   }
 

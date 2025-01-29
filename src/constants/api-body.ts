@@ -23,3 +23,15 @@ export const USER_BODY = {
     address: 'XYZ Street',
   },
 };
+
+export const FORM_BODY = {
+  fields: [
+    {
+      label: 'Name',
+      type: 'text',
+      required: true,
+      options: [],
+      order: 1,
+    },
+  ],
+};
