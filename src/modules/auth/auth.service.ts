@@ -7,12 +7,14 @@ import { RegisterDto } from './dto/register.dto';
 import { createResponse } from 'src/helper/api.helper';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { AuditLogService } from '../audit-log/audit-log.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -86,6 +88,15 @@ export class AuthService {
     const token = await this.jwtService.signAsync(payload);
 
     const data = { token };
+
+    // Create audit log
+    await this.auditLogService.createAuditLog({
+      userId: user.id,
+      email: user.email,
+      action: 'LOGIN',
+      resource: 'Successfully login',
+      data: JSON.stringify(payload),
+    });
 
     return createResponse('success', HttpStatus.CREATED, data);
   }

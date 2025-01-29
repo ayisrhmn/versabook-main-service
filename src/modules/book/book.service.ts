@@ -4,15 +4,39 @@ import { Model } from 'mongoose';
 import { Book } from './schemas/book.schema';
 import { BookDto } from './dto/book.dto';
 import { createResponse } from 'src/helper/api.helper';
+import { UserService } from '../user/user.service';
+import { AuditLogService } from '../audit-log/audit-log.service';
 
 @Injectable()
 export class BookService {
-  constructor(@InjectModel(Book.name) private bookModel: Model<Book>) {}
+  constructor(
+    @InjectModel(Book.name) private bookModel: Model<Book>,
+    private readonly userService: UserService,
+    private readonly auditLogService: AuditLogService,
+  ) {}
 
   // Create book
   async createBook(userId: string, BookDto: BookDto) {
     const newBook = new this.bookModel({ userId, ...BookDto });
     const result = await newBook.save();
+
+    // Find user
+    const user = await this.userService.getUser(userId);
+    if (user) {
+      const userData = user.data;
+
+      // Create log
+      if (userData) {
+        await this.auditLogService.createAuditLog({
+          userId,
+          email: userData.email,
+          action: 'CREATE',
+          resource: 'Create Book',
+          data: JSON.stringify(result),
+        });
+      }
+    }
+
     return createResponse('success', 201, result);
   }
 
@@ -73,6 +97,23 @@ export class BookService {
     book.deletedAt = null;
     await book.save();
 
+    // Find user
+    const user = await this.userService.getUser(userId);
+    if (user) {
+      const userData = user.data;
+
+      // Create log
+      if (userData) {
+        await this.auditLogService.createAuditLog({
+          userId,
+          email: userData.email,
+          action: 'UPDATE',
+          resource: 'Activated Book',
+          data: JSON.stringify(book),
+        });
+      }
+    }
+
     return createResponse('success', 200, 'Book activated successfully');
   }
 
@@ -91,16 +132,52 @@ export class BookService {
     book.deletedAt = new Date();
     await book.save();
 
+    // Find user
+    const user = await this.userService.getUser(userId);
+    if (user) {
+      const userData = user.data;
+
+      // Create log
+      if (userData) {
+        await this.auditLogService.createAuditLog({
+          userId,
+          email: userData.email,
+          action: 'DELETE',
+          resource: 'Cancel Book',
+          data: JSON.stringify(book),
+        });
+      }
+    }
+
     return createResponse('success', 200, 'Book canceled successfully');
   }
 
   // Delete book
-  async deleteBook(bookId: string) {
-    const booking = await this.bookModel.findByIdAndDelete(bookId);
-    if (!booking)
+  async deleteBook(userId: string, bookId: string) {
+    const book = await this.bookModel.findByIdAndDelete(bookId);
+    if (!book) {
       throw new NotFoundException(
-        createResponse('error', 404, 'Booking not found'),
+        createResponse('error', 404, 'Book not found'),
       );
-    return createResponse('success', 200, 'Booking deleted permanently');
+    }
+
+    // Find user
+    const user = await this.userService.getUser(userId);
+    if (user) {
+      const userData = user.data;
+
+      // Create log
+      if (userData) {
+        await this.auditLogService.createAuditLog({
+          userId,
+          email: userData.email,
+          action: 'DELETE',
+          resource: 'Delete Book',
+          data: JSON.stringify(book),
+        });
+      }
+    }
+
+    return createResponse('success', 200, 'Book deleted permanently');
   }
 }

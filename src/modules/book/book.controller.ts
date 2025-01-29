@@ -108,7 +108,7 @@ export class BookController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'API for delete book' })
-  async deleteBook(@Param('id') bookId: string) {
-    return this.bookService.deleteBook(bookId);
+  async deleteBook(@Req() req: { user: Me }, @Param('id') bookId: string) {
+    return this.bookService.deleteBook(req.user.id, bookId);
   }
 }

@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { FormModule } from './modules/form/form.module';
 import { BookModule } from './modules/book/book.module';
+import { AuditLogModule } from './modules/audit-log/audit-log.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { BookModule } from './modules/book/book.module';
     UserModule,
     FormModule,
     BookModule,
+    AuditLogModule,
   ],
   controllers: [AppController],
   providers: [AppService],
